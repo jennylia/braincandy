@@ -1,5 +1,6 @@
 require "minitest/autorun"
 require "minitest/pride"
+require "pry"
 
 class Solver < Minitest::Test
   def setup
@@ -13,24 +14,26 @@ class Solver < Minitest::Test
   def solver_brute_force(tiles)
   	ans = []
 
-
-  	if (tiles.empty?)
+  	if (tiles.empty? || tiles.length > 8)
   		return ans
   	end
 
-  	if (tiles.length > 8)
-  		return ans
-  	end
+  	#if we are assuming that we can use a tile how many ever times we want
 
-  	#assuming that we can use a tile how many ever times we want
   	#generate all sorts of permutations for tiles
   	unique_tiles = tiles.chars.uniq.sort
-
+  	tiles_combo = []
   	#let us try to use combination
-  	tiles_combo = unique_tiles.permutation.map(&:join)
+  	for i in 1..unique_tiles.length
+  		cur_combo = unique_tiles.combination(i).to_a
+  		cur_combo.each do |c|
+  			c = c.join
+  			tiles_combo.concat(c.chars.permutation.map(&:join))
+  		end
+  	end
 
+  	tiles_combo = tiles_combo.uniq.sort
   	tiles_combo.each do |t|
-
   		if @words.include?(t)
   			ans.push(t)
   		end
@@ -52,6 +55,6 @@ class Solver < Minitest::Test
   end
 
   def test_word
-  	assert_equal ["act", "cat"], solver_brute_force("cat")
+  	assert_equal ["a", "act", "at", "c", "ca", "cat", "t", "ta"], solver_brute_force("cat")
   end
 end
